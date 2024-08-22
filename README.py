@@ -1,30 +1,31 @@
 def to_uppercase(obj):
     if isinstance(obj, dict):
-        # If the object is a dictionary, recurse through its keys and values
+        # Recursively convert both keys and values to uppercase
         return {to_uppercase(k): to_uppercase(v) for k, v in obj.items()}
     elif isinstance(obj, list):
-        # If the object is a list, recurse through its elements
+        # Recursively apply the conversion to each item in the list
         return [to_uppercase(item) for item in obj]
     elif isinstance(obj, str):
-        # If the object is a string, convert it to uppercase
+        # Convert strings to uppercase
         return obj.upper()
     else:
-        # If the object is of any other type, return it as is
+        # Return non-string types as is
         return obj
 
-# Example object with nested structures
+# Example object with up to three levels of nesting
 example_obj = {
-    'name': 'john doe',
-    'age': 30,
-    'address': {
-        'city': 'new york',
-        'country': 'usa'
+    'level1': {
+        'level2a': {
+            'level3a': 'some value',
+            'level3b': 'another value'
+        },
+        'level2b': {
+            'level3c': 'more value',
+            'level3d': 'yet another value'
+        }
     },
-    'hobbies': ['reading', 'travelling'],
-    'details': [
-        {'info': 'some info'},
-        {'info': 'more info'}
-    ]
+    'simpleKey': 'simple value',
+    'simpleList': ['item1', 'item2']
 }
 
 # Convert all keys and strings to uppercase
