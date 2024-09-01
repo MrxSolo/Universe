@@ -1,74 +1,52 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class ExcelToArrayOfObjects {
+public class ReplaceValuesWithMappingDemo {
     public static void main(String[] args) {
-        String excelFilePath = "data.xlsx";  // Replace with your Excel file path
+        // Original object
+        Map<String, Object> originalObject = new HashMap<>();
+        originalObject.put("name", "John");
+        originalObject.put("age", 25);
+        originalObject.put("city", "Mumbai");
+        originalObject.put("profession", "Engineer");
 
-        List<Map<String, Object>> result = new ArrayList<>();
+        // New object from the array
+        Map<String, Object> newObject = new HashMap<>();
+        newObject.put("p_name", "Alice");
+        newObject.put("p_age", 30);
+        newObject.put("city", "Delhi");
 
-        try (FileInputStream fis = new FileInputStream(excelFilePath);
-             Workbook workbook = new XSSFWorkbook(fis)) {
+        // Define key mapping between original object and new object
+        Map<String, String> keyMapping = new HashMap<>();
+        keyMapping.put("name", "p_name");
+        keyMapping.put("age", "p_age");
+        keyMapping.put("city", "city");
 
-            Sheet sheet = workbook.getSheetAt(0);
-            Row headerRow = sheet.getRow(0);
-            int numberOfColumns = headerRow.getLastCellNum();
+        // Replace values based on the key mapping
+        replaceValuesWithMapping(originalObject, newObject, keyMapping);
 
-            for (int colIndex = 1; colIndex < numberOfColumns; colIndex++) {
-                Map<String, Object> obj = new HashMap<>();
-                
-                // Loop through each row in the current column
-                for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
-                    Row row = sheet.getRow(rowIndex);
-                    if (row != null) {
-                        Cell keyCell = row.getCell(0);  // Key from the first column
-                        Cell valueCell = row.getCell(colIndex);  // Value from the current column
-
-                        if (keyCell != null && valueCell != null) {
-                            String key = keyCell.getStringCellValue();
-                            Object value = getCellValue(valueCell);
-                            obj.put(key, value);
-                        }
-                    }
-                }
-                result.add(obj);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Print the result
-        for (Map<String, Object> map : result) {
-            System.out.println(map);
-        }
+        // Print the modified original object
+        System.out.println(originalObject);
     }
 
-    // Helper method to get the cell value as an Object
-    private static Object getCellValue(Cell cell) {
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getDateCellValue();
-                } else {
-                    return cell.getNumericCellValue();
-                }
-            case BOOLEAN:
-                return cell.getBooleanCellValue();
-            case FORMULA:
-                return cell.getCellFormula();
-            case BLANK:
-                return "";
-            default:
-                return null;
+    /**
+     * Replaces values in the original object with values from the new object
+     * based on a provided key mapping.
+     *
+     * @param originalObject The original object whose values are to be replaced.
+     * @param newObject The new object with the values to replace.
+     * @param keyMapping A mapping of keys in the original object to keys in the new object.
+     */
+    public static void replaceValuesWithMapping(Map<String, Object> originalObject, Map<String, Object> newObject, Map<String, String> keyMapping) {
+        // Loop through each entry in the key mapping
+        for (Map.Entry<String, String> entry : keyMapping.entrySet()) {
+            String originalKey = entry.getKey();
+            String newKey = entry.getValue();
+
+            // If the new object has the key mapped to the original key, replace the value
+            if (newObject.containsKey(newKey)) {
+                originalObject.put(originalKey, newObject.get(newKey));
+            }
         }
     }
 }
