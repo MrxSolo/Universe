@@ -1,52 +1,63 @@
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class ReplaceValuesWithMappingDemo {
+public class ProductDetailSplitter {
     public static void main(String[] args) {
-        // Original object
-        Map<String, Object> originalObject = new HashMap<>();
-        originalObject.put("name", "John");
-        originalObject.put("age", 25);
-        originalObject.put("city", "Mumbai");
-        originalObject.put("profession", "Engineer");
+        // First object (template)
+        Map<String, Object> templateObject = new HashMap<>();
+        templateObject.put("pOrderNo", 1);
+        templateObject.put("pDetailName", "150ml");
+        templateObject.put("pSize", "hello");
 
-        // New object from the array
-        Map<String, Object> newObject = new HashMap<>();
-        newObject.put("p_name", "Alice");
-        newObject.put("p_age", 30);
-        newObject.put("city", "Delhi");
+        // Second object (source for replacement and splitting)
+        Map<String, Object> sourceObject = new HashMap<>();
+        sourceObject.put("Product details", "100ml\n150ml\n200ml");
+        sourceObject.put("packet size", "hello");
 
-        // Define key mapping between original object and new object
-        Map<String, String> keyMapping = new HashMap<>();
-        keyMapping.put("name", "p_name");
-        keyMapping.put("age", "p_age");
-        keyMapping.put("city", "city");
+        // Call the function to split and replace values
+        List<Map<String, Object>> result = splitAndReplaceValues(templateObject, sourceObject);
 
-        // Replace values based on the key mapping
-        replaceValuesWithMapping(originalObject, newObject, keyMapping);
-
-        // Print the modified original object
-        System.out.println(originalObject);
+        // Print the result
+        for (Map<String, Object> obj : result) {
+            System.out.println(obj);
+        }
     }
 
     /**
-     * Replaces values in the original object with values from the new object
-     * based on a provided key mapping.
+     * Splits product details from the source object and replaces values in the
+     * template object to create a list of product objects.
      *
-     * @param originalObject The original object whose values are to be replaced.
-     * @param newObject The new object with the values to replace.
-     * @param keyMapping A mapping of keys in the original object to keys in the new object.
+     * @param templateObject The template object containing initial key-value pairs.
+     * @param sourceObject The source object with product details and other values.
+     * @return A list of maps representing the new objects with replaced values.
      */
-    public static void replaceValuesWithMapping(Map<String, Object> originalObject, Map<String, Object> newObject, Map<String, String> keyMapping) {
-        // Loop through each entry in the key mapping
-        for (Map.Entry<String, String> entry : keyMapping.entrySet()) {
-            String originalKey = entry.getKey();
-            String newKey = entry.getValue();
+    public static List<Map<String, Object>> splitAndReplaceValues(Map<String, Object> templateObject, Map<String, Object> sourceObject) {
+        // Extract product details and split by newline
+        String productDetails = (String) sourceObject.get("Product details");
+        String[] productArray = productDetails.split("\\n");
 
-            // If the new object has the key mapped to the original key, replace the value
-            if (newObject.containsKey(newKey)) {
-                originalObject.put(originalKey, newObject.get(newKey));
-            }
+        // Extract packet size
+        String packetSize = (String) sourceObject.get("packet size");
+
+        // List to hold the resulting objects
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        // Create new objects based on the number of products
+        for (int i = 0; i < productArray.length; i++) {
+            // Create a new map for each product
+            Map<String, Object> newObj = new HashMap<>(templateObject);
+
+            // Update values in the new object
+            newObj.put("pOrderNo", i + 1);  // Order number starts from 1
+            newObj.put("pDetailName", productArray[i]);  // Replace detail name
+            newObj.put("pSize", packetSize);  // Replace size
+
+            // Add the new object to the result list
+            result.add(newObj);
         }
+
+        return result;
     }
 }
